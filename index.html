@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BAKIGEN</title>
+<style>
+  :root {
+    --purple: #7C3AED;
+    --pink: #EC4899;
+    --bg: #0F0B1E;
+    --card: #1A1530;
+    --text: #F4F2FA;
+    --muted: #9B93B8;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    background: radial-gradient(circle at 20% 10%, #2A1F4D 0%, var(--bg) 55%);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  .app { width: 100%; max-width: 480px; }
+  .logo {
+    text-align: center;
+    font-size: 2rem;
+    font-weight: 800;
+    letter-spacing: -1px;
+    margin-bottom: 8px;
+    background: linear-gradient(90deg, var(--purple), var(--pink));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .tagline { text-align: center; color: var(--muted); margin-bottom: 32px; font-size: 0.9rem; }
+  .card {
+    background: var(--card);
+    border: 1px solid #2E2650;
+    border-radius: 20px;
+    padding: 28px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+  }
+  input[type=text], input[type=password] {
+    width: 100%;
+    padding: 14px 16px;
+    border-radius: 12px;
+    border: 1px solid #3A3260;
+    background: #14102A;
+    color: var(--text);
+    font-size: 1rem;
+    outline: none;
+  }
+  input:focus { border-color: var(--purple); }
+  button {
+    width: 100%;
+    padding: 14px;
+    margin-top: 14px;
+    border: none;
+    border-radius: 12px;
+    background: linear-gradient(90deg, var(--purple), var(--pink));
+    color: white;
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: opacity 0.2s, transform 0.1s;
+  }
+  button:hover { opacity: 0.92; }
+  button:active { transform: scale(0.98); }
+  button:disabled { opacity: 0.5; cursor: not-allowed; }
+  .error { color: #F87171; font-size: 0.85rem; margin-top: 10px; text-align: center; }
+  .upload-zone {
+    border: 2px dashed #3A3260;
+    border-radius: 16px;
+    padding: 30px 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+    margin-bottom: 16px;
+  }
+  .upload-zone:hover { border-color: var(--purple); background: rgba(124,58,237,0.06); }
+  .upload-zone.has-image { padding: 12px; }
+  .upload-zone img { max-width: 100%; max-height: 220px; border-radius: 10px; display: block; margin: 0 auto; }
+  .upload-hint { color: var(--muted); font-size: 0.9rem; }
+  .upload-icon { font-size: 2rem; margin-bottom: 8px; }
+  #fileInput { display: none; }
+  .result { margin-top: 20px; display: none; }
+  .result.show { display: block; }
+  .field { margin-bottom: 16px; }
+  .field label {
+    display: block;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--muted);
+    margin-bottom: 6px;
+    font-weight: 600;
+  }
+  .field-content {
+    background: #14102A;
+    border: 1px solid #2E2650;
+    border-radius: 10px;
+    padding: 12px 14px;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    position: relative;
+  }
+  .price { font-size: 1.4rem; font-weight: 800; color: var(--pink); }
+  .copy-btn {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: auto;
+    padding: 4px 10px;
+    margin: 0;
+    font-size: 0.75rem;
+    background: #2E2650;
+  }
+  .spinner {
+    display: none;
+    text-align: center;
+    color: var(--muted);
+    margin-top: 16px;
+    font-size: 0.9rem;
+  }
+  .spinner.show { display: block; }
+  .logout {
+    text-align: center;
+    margin-top: 20px;
+  }
+  .logout a { color: var(--muted); font-size: 0.8rem; text-decoration: none; cursor: pointer; }
+  .logout a:hover { color: var(--text); }
+  .tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 20px;
+    background: #14102A;
+    padding: 4px;
+    border-radius: 12px;
+  }
+  .tab-btn {
+    flex: 1;
+    margin: 0;
+    padding: 10px;
+    border-radius: 9px;
+    background: transparent;
+    color: var(--muted);
+    font-weight: 600;
+    font-size: 0.9rem;
+  }
+  .tab-btn.active { background: linear-gradient(90deg, var(--purple), var(--pink)); color: white; }
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+  .row-2 { display: flex; gap: 10px; }
+  .row-2 .field { flex: 1; }
+  select {
+    width: 100%;
+    padding: 14px 16px;
+    border-radius: 12px;
+    border: 1px solid #3A3260;
+    background: #14102A;
+    color: var(--text);
+    font-size: 1rem;
+    outline: none;
+  }
+  .history-item {
+    background: #14102A;
+    border: 1px solid #2E2650;
+    border-radius: 12px;
+    padding: 14px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    transition: border-color 0.2s;
+  }
+  .history-item:hover { border-color: var(--purple); }
+  .history-item .h-title { font-weight: 700; font-size: 0.95rem; margin-bottom: 4px; }
+  .history-item .h-meta { color: var(--muted); font-size: 0.8rem; display: flex; justify-content: space-between; }
+  .history-item .h-price { color: var(--pink); font-weight: 700; }
+  .empty-history { text-align: center; color: var(--muted); font-size: 0.9rem; padding: 30px 0; }
+  .history-detail-back {
+    background: #2E2650;
+    margin-bottom: 16px;
+  }
+  .delete-item {
+    width: auto;
+    padding: 6px 12px;
+    margin-top: 12px;
+    background: #3A1F2E;
+    color: #F87171;
+    font-size: 0.85rem;
+  }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <div class="logo">BAKIGEN</div>
+  <div class="tagline">Photo → annonce Vinted prête à publier</div>
+
+  <!-- Écran de verrouillage -->
+  <div class="card" id="gateCard">
+    <input type="password" id="accessCode" placeholder="Code d'accès">
+    <button id="unlockBtn">Déverrouiller</button>
+    <div class="error" id="gateError"></div>
+  </div>
+
+  <!-- Écran principal -->
+  <div class="card" id="mainCard" style="display:none;">
+    <div class="tabs">
+      <button class="tab-btn active" id="tabGenBtn">Générateur</button>
+      <button class="tab-btn" id="tabHistBtn">Historique</button>
+    </div>
+
+    <!-- Onglet Générateur -->
+    <div class="tab-panel active" id="tabGen">
+      <div class="upload-zone" id="uploadZone">
+        <input type="file" id="fileInput" accept="image/*">
+        <div id="uploadContent">
+          <div class="upload-icon">📸</div>
+          <div class="upload-hint">Clique pour ajouter une photo</div>
+        </div>
+      </div>
+
+      <div class="row-2">
+        <div class="field">
+          <label>Taille</label>
+          <input type="text" id="tailleInput" placeholder="ex: M, 38, 42...">
+        </div>
+        <div class="field">
+          <label>État</label>
+          <select id="etatInput">
+            <option value="Neuf avec étiquette">Neuf avec étiquette</option>
+            <option value="Neuf sans étiquette">Neuf sans étiquette</option>
+            <option value="Très bon état" selected>Très bon état</option>
+            <option value="Bon état">Bon état</option>
+            <option value="Satisfaisant">Satisfaisant</option>
+          </select>
+        </div>
+      </div>
+
+      <button id="generateBtn" disabled>Générer l'annonce</button>
+      <div class="spinner" id="spinner">Analyse de la photo en cours...</div>
+
+      <div class="result" id="result">
+        <div class="field">
+          <label>Titre</label>
+          <div class="field-content">
+            <button class="copy-btn" data-copy="titleText">Copier</button>
+            <span id="titleText"></span>
+          </div>
+        </div>
+        <div class="field">
+          <label>Description</label>
+          <div class="field-content">
+            <button class="copy-btn" data-copy="descText">Copier</button>
+            <span id="descText"></span>
+          </div>
+        </div>
+        <div class="row-2">
+          <div class="field">
+            <label>Taille</label>
+            <div class="field-content" id="sizeText"></div>
+          </div>
+          <div class="field">
+            <label>État</label>
+            <div class="field-content" id="conditionText"></div>
+          </div>
+        </div>
+        <div class="field">
+          <label>Prix conseillé</label>
+          <div class="field-content price" id="priceText"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Onglet Historique -->
+    <div class="tab-panel" id="tabHist">
+      <div id="historyList"></div>
+    </div>
+
+    <!-- Détail d'un élément de l'historique -->
+    <div class="tab-panel" id="tabHistDetail">
+      <button class="history-detail-back" id="backToHistBtn">← Retour à l'historique</button>
+      <div class="field">
+        <label>Titre</label>
+        <div class="field-content"><span id="dTitle"></span></div>
+      </div>
+      <div class="field">
+        <label>Description</label>
+        <div class="field-content"><span id="dDesc"></span></div>
+      </div>
+      <div class="row-2">
+        <div class="field">
+          <label>Taille</label>
+          <div class="field-content" id="dSize"></div>
+        </div>
+        <div class="field">
+          <label>État</label>
+          <div class="field-content" id="dCondition"></div>
+        </div>
+      </div>
+      <div class="field">
+        <label>Prix conseillé</label>
+        <div class="field-content price" id="dPrice"></div>
+      </div>
+      <button class="delete-item" id="deleteItemBtn">Supprimer cette annonce</button>
+    </div>
+
+    <div class="logout"><a id="logoutLink">Verrouiller le site</a></div>
+  </div>
+</div>
+
+<script>
+  // ⚠️ Change ce code par celui de ton choix avant de partager le fichier
+  const ACCESS_CODE = "bakigen2026";
+
+  const gateCard = document.getElementById('gateCard');
+  const mainCard = document.getElementById('mainCard');
+  const accessCodeInput = document.getElementById('accessCode');
+  const unlockBtn = document.getElementById('unlockBtn');
+  const gateError = document.getElementById('gateError');
+
+  function checkUnlocked() {
+    if (localStorage.getItem('bakigen_unlocked') === 'true') {
+      gateCard.style.display = 'none';
+      mainCard.style.display = 'block';
+    }
+  }
+
+  unlockBtn.addEventListener('click', () => {
+    if (accessCodeInput.value === ACCESS_CODE) {
+      localStorage.setItem('bakigen_unlocked', 'true');
+      gateError.textContent = '';
+      gateCard.style.display = 'none';
+      mainCard.style.display = 'block';
+    } else {
+      gateError.textContent = 'Code incorrect.';
+    }
+  });
+  accessCodeInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') unlockBtn.click();
+  });
+
+  document.getElementById('logoutLink').addEventListener('click', () => {
+    localStorage.removeItem('bakigen_unlocked');
+    location.reload();
+  });
+
+  checkUnlocked();
+
+  // ---- Onglets ----
+  const tabGenBtn = document.getElementById('tabGenBtn');
+  const tabHistBtn = document.getElementById('tabHistBtn');
+  const tabGen = document.getElementById('tabGen');
+  const tabHist = document.getElementById('tabHist');
+  const tabHistDetail = document.getElementById('tabHistDetail');
+
+  function showTab(name) {
+    [tabGen, tabHist, tabHistDetail].forEach(p => p.classList.remove('active'));
+    [tabGenBtn, tabHistBtn].forEach(b => b.classList.remove('active'));
+    if (name === 'gen') { tabGen.classList.add('active'); tabGenBtn.classList.add('active'); }
+    if (name === 'hist') { tabHist.classList.add('active'); tabHistBtn.classList.add('active'); renderHistory(); }
+    if (name === 'detail') { tabHistDetail.classList.add('active'); tabHistBtn.classList.add('active'); }
+  }
+  tabGenBtn.addEventListener('click', () => showTab('gen'));
+  tabHistBtn.addEventListener('click', () => showTab('hist'));
+  document.getElementById('backToHistBtn').addEventListener('click', () => showTab('hist'));
+
+  // ---- Historique (stocké dans le navigateur) ----
+  function getHistory() {
+    try { return JSON.parse(localStorage.getItem('bakigen_history')) || []; }
+    catch { return []; }
+  }
+  function saveHistory(list) {
+    localStorage.setItem('bakigen_history', JSON.stringify(list));
+  }
+  function addToHistory(entry) {
+    const list = getHistory();
+    list.unshift(entry);
+    saveHistory(list);
+  }
+  let currentDetailId = null;
+
+  function renderHistory() {
+    const list = getHistory();
+    const container = document.getElementById('historyList');
+    if (list.length === 0) {
+      container.innerHTML = '<div class="empty-history">Aucune annonce générée pour l\'instant.</div>';
+      return;
+    }
+    container.innerHTML = list.map(item => `
+      <div class="history-item" data-id="${item.id}">
+        <div class="h-title">${escapeHtml(item.titre)}</div>
+        <div class="h-meta">
+          <span>${escapeHtml(item.taille)} · ${escapeHtml(item.etat)} · ${item.date}</span>
+          <span class="h-price">${escapeHtml(item.prix)}</span>
+        </div>
+      </div>
+    `).join('');
+    container.querySelectorAll('.history-item').forEach(el => {
+      el.addEventListener('click', () => openDetail(el.dataset.id));
+    });
+  }
+
+  function openDetail(id) {
+    const list = getHistory();
+    const item = list.find(i => i.id === id);
+    if (!item) return;
+    currentDetailId = id;
+    document.getElementById('dTitle').textContent = item.titre;
+    document.getElementById('dDesc').textContent = item.description;
+    document.getElementById('dSize').textContent = item.taille;
+    document.getElementById('dCondition').textContent = item.etat;
+    document.getElementById('dPrice').textContent = item.prix;
+    showTab('detail');
+  }
+
+  document.getElementById('deleteItemBtn').addEventListener('click', () => {
+    if (!currentDetailId) return;
+    const list = getHistory().filter(i => i.id !== currentDetailId);
+    saveHistory(list);
+    showTab('hist');
+  });
+
+  function escapeHtml(str) {
+    const div = document.createElement('div');
+    div.textContent = str ?? '';
+    return div.innerHTML;
+  }
+
+  // ---- Générateur ----
+  const uploadZone = document.getElementById('uploadZone');
+  const fileInput = document.getElementById('fileInput');
+  const uploadContent = document.getElementById('uploadContent');
+  const generateBtn = document.getElementById('generateBtn');
+  const spinner = document.getElementById('spinner');
+  const result = document.getElementById('result');
+  const tailleInput = document.getElementById('tailleInput');
+  const etatInput = document.getElementById('etatInput');
+
+  let base64Image = null;
+  let mediaType = null;
+
+  uploadZone.addEventListener('click', () => fileInput.click());
+
+  fileInput.addEventListener('change', () => {
+    const file = fileInput.files[0];
+    if (!file) return;
+    mediaType = file.type;
+    const reader = new FileReader();
+    reader.onload = () => {
+      base64Image = reader.result.split(',')[1];
+      uploadContent.innerHTML = `<img src="${reader.result}" alt="aperçu">`;
+      uploadZone.classList.add('has-image');
+      generateBtn.disabled = false;
+      result.classList.remove('show');
+    };
+    reader.readAsDataURL(file);
+  });
+
+  generateBtn.addEventListener('click', async () => {
+    if (!base64Image) return;
+    generateBtn.disabled = true;
+    spinner.classList.add('show');
+    result.classList.remove('show');
+
+    const taille = tailleInput.value.trim() || 'Non précisée';
+    const etat = etatInput.value;
+
+    try {
+      const response = await fetch("/.netlify/functions/generate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ base64Image, mediaType, taille, etat })
+      });
+      const parsed = await response.json();
+      if (!response.ok) throw new Error(parsed.error || "Erreur serveur");
+
+      document.getElementById('titleText').textContent = parsed.titre;
+      document.getElementById('descText').textContent = parsed.description;
+      document.getElementById('sizeText').textContent = taille;
+      document.getElementById('conditionText').textContent = etat;
+      document.getElementById('priceText').textContent = parsed.prix;
+      result.classList.add('show');
+
+      addToHistory({
+        id: Date.now().toString(),
+        titre: parsed.titre,
+        description: parsed.description,
+        taille: taille,
+        etat: etat,
+        prix: parsed.prix,
+        date: new Date().toLocaleDateString('fr-FR')
+      });
+    } catch (err) {
+      alert("Erreur lors de la génération. Réessaie.");
+      console.error(err);
+    } finally {
+      spinner.classList.remove('show');
+      generateBtn.disabled = false;
+    }
+  });
+
+  document.querySelectorAll('.copy-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const text = document.getElementById(btn.dataset.copy).textContent;
+      navigator.clipboard.writeText(text);
+      btn.textContent = 'Copié !';
+      setTimeout(() => btn.textContent = 'Copier', 1200);
+    });
+  });
+</script>
+
+</body>
+</html>
