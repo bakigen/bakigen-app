@@ -192,6 +192,10 @@
     color: #F87171;
     font-size: 0.85rem;
   }
+  .category-badge {
+    color: var(--purple);
+    font-weight: 700;
+  }
 </style>
 </head>
 <body>
@@ -261,6 +265,16 @@
         </div>
         <div class="row-2">
           <div class="field">
+            <label>Marque</label>
+            <div class="field-content" id="brandText"></div>
+          </div>
+          <div class="field">
+            <label>Catégorie Vinted</label>
+            <div class="field-content category-badge" id="categoryText"></div>
+          </div>
+        </div>
+        <div class="row-2">
+          <div class="field">
             <label>Taille</label>
             <div class="field-content" id="sizeText"></div>
           </div>
@@ -291,6 +305,16 @@
       <div class="field">
         <label>Description</label>
         <div class="field-content"><span id="dDesc"></span></div>
+      </div>
+      <div class="row-2">
+        <div class="field">
+          <label>Marque</label>
+          <div class="field-content" id="dBrand"></div>
+        </div>
+        <div class="field">
+          <label>Catégorie Vinted</label>
+          <div class="field-content category-badge" id="dCategory"></div>
+        </div>
       </div>
       <div class="row-2">
         <div class="field">
@@ -395,7 +419,7 @@
       <div class="history-item" data-id="${item.id}">
         <div class="h-title">${escapeHtml(item.titre)}</div>
         <div class="h-meta">
-          <span>${escapeHtml(item.taille)} · ${escapeHtml(item.etat)} · ${item.date}</span>
+          <span>${escapeHtml(item.marque || 'Marque ?')} · ${escapeHtml(item.taille)} · ${item.date}</span>
           <span class="h-price">${escapeHtml(item.prix)}</span>
         </div>
       </div>
@@ -412,6 +436,8 @@
     currentDetailId = id;
     document.getElementById('dTitle').textContent = item.titre;
     document.getElementById('dDesc').textContent = item.description;
+    document.getElementById('dBrand').textContent = item.marque || 'Non identifiée';
+    document.getElementById('dCategory').textContent = item.categorie || 'Non déterminée';
     document.getElementById('dSize').textContent = item.taille;
     document.getElementById('dCondition').textContent = item.etat;
     document.getElementById('dPrice').textContent = item.prix;
@@ -481,6 +507,8 @@
 
       document.getElementById('titleText').textContent = parsed.titre;
       document.getElementById('descText').textContent = parsed.description;
+      document.getElementById('brandText').textContent = parsed.marque || 'Non identifiée';
+      document.getElementById('categoryText').textContent = parsed.categorie || 'Non déterminée';
       document.getElementById('sizeText').textContent = taille;
       document.getElementById('conditionText').textContent = etat;
       document.getElementById('priceText').textContent = parsed.prix;
@@ -490,6 +518,8 @@
         id: Date.now().toString(),
         titre: parsed.titre,
         description: parsed.description,
+        marque: parsed.marque || 'Non identifiée',
+        categorie: parsed.categorie || 'Non déterminée',
         taille: taille,
         etat: etat,
         prix: parsed.prix,
