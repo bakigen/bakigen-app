@@ -720,13 +720,16 @@
     const etat = etatInput.value;
 
     try {
-      const response = await fetch("/.netlify/functions/generate", {
+      const response = await fetch("/api/generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ base64Image, mediaType, taille, etat })
       });
       const parsed = await response.json();
-      if (!response.ok) throw new Error(parsed.error || "Erreur serveur");
+      if (!response.ok) {
+        const detail = typeof parsed.error === 'string' ? parsed.error : JSON.stringify(parsed.error);
+        throw new Error(detail || ('Erreur serveur ' + response.status));
+      }
 
       document.getElementById('titleText').textContent = parsed.titre;
       document.getElementById('descText').textContent = parsed.description;
@@ -748,7 +751,7 @@
         date: new Date().toLocaleDateString('fr-FR')
       });
     } catch (err) {
-      alert("Erreur lors de la génération. Réessaie.");
+      alert("Erreur : " + err.message);
       console.error(err);
     } finally {
       spinner.classList.remove('show');
