@@ -89,6 +89,29 @@
     line-height: 1.55;
     margin-bottom: 8px;
   }
+  .landing-tabs {
+    display: flex;
+    gap: 6px;
+    background: #1F1219;
+    padding: 4px;
+    border-radius: 12px;
+    margin-bottom: 16px;
+  }
+  .landing-tab-btn {
+    flex: 1;
+    margin: 0;
+    padding: 9px 4px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    background: transparent;
+    color: var(--muted);
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+  }
+  .landing-tab-btn.active { background: linear-gradient(90deg, var(--pink), var(--pink-deep)); color: white; }
+  .landing-tab-panel { display: none; }
+  .landing-tab-panel.active { display: block; }
   .landing-points { list-style: none; margin-top: 10px; }
   .landing-points li {
     display: flex;
@@ -431,54 +454,63 @@
       </ul>
     </div>
 
-    <div class="landing-section">
-      <h3>Aperçu de l'application</h3>
-      <p>Voici à quoi ressemble ton espace une fois déverrouillé.</p>
+    <div class="landing-tabs">
+      <button type="button" class="landing-tab-btn active" data-ltab="apercu">Aperçu</button>
+      <button type="button" class="landing-tab-btn" data-ltab="tarifs">Tarifs</button>
+    </div>
 
-      <div class="mock-title">Générateur</div>
-      <div class="mock-upload">
-        <div class="icon">📸</div>
-        Clique pour ajouter une photo
+    <div class="landing-tab-panel active" id="ltab-apercu">
+      <div class="landing-section">
+        <h3>Aperçu de l'application</h3>
+        <p>Voici à quoi ressemble ton espace une fois déverrouillé.</p>
+
+        <div class="mock-title">Générateur</div>
+        <div class="mock-upload">
+          <div class="icon">📸</div>
+          Clique pour ajouter une photo
+        </div>
+
+        <div class="mock-title">Annonce générée</div>
+        <div class="mock-field-content"><strong>Robe fleurie Zara, taille M</strong></div>
+        <div class="mock-field-content">Robe légère à motifs floraux, parfaite pour l'été. Peu portée, aucun défaut.</div>
+        <div class="mock-field-content">Prix conseillé : <span class="mock-price">18€</span></div>
+      </div>
+    </div>
+
+    <div class="landing-tab-panel" id="ltab-tarifs">
+      <div class="landing-section">
+        <h3>💰 Le programme d'affiliation</h3>
+        <p>Ton compte te donne aussi accès à un programme d'affiliation : parraine tes proches et touche une commission à chaque vente réalisée grâce à toi.</p>
+        <ul class="landing-points" style="margin-top:0;">
+          <li><span class="dot">✓</span> <span><strong style="color:var(--green);">5€</strong> de commission pour chaque vente du pack seul (BAKIGEN ou BAKIPROFIT)</span></li>
+          <li><span class="dot">✓</span> <span><strong style="color:var(--green);">15€</strong> de commission pour chaque vente du pack complet</span></li>
+          <li><span class="dot">✓</span> Suivi de tes commissions directement dans ton espace BAKIPROFIT</li>
+        </ul>
       </div>
 
-      <div class="mock-title">Annonce générée</div>
-      <div class="mock-field-content"><strong>Robe fleurie Zara, taille M</strong></div>
-      <div class="mock-field-content">Robe légère à motifs floraux, parfaite pour l'été. Peu portée, aucun défaut.</div>
-      <div class="mock-field-content">Prix conseillé : <span class="mock-price">18€</span></div>
-    </div>
+      <div class="landing-section">
+        <h3>Tarifs</h3>
+        <ul class="landing-points" style="margin-top:0;">
+          <li>
+            <span class="dot">✓</span>
+            <span>BAKIGEN seul — <strong style="color:var(--green);">24,90€</strong> (accès à vie)</span>
+          </li>
+          <li>
+            <span class="dot">✓</span>
+            <span>BAKIPROFIT seul — <strong style="color:var(--green);">19,90€</strong> (accès à vie)</span>
+          </li>
+          <li>
+            <span class="dot">✓</span>
+            <span>Pack BAKIGEN + BAKIPROFIT — <strong style="color:var(--green);">40€</strong> (accès à vie)</span>
+          </li>
+        </ul>
+        <p style="margin-top:12px; margin-bottom:0;">Pour l'achat, contacte-nous directement sur Instagram 👇</p>
+      </div>
 
-    <div class="landing-section">
-      <h3>💰 Le programme d'affiliation</h3>
-      <p>Ton compte te donne aussi accès à un programme d'affiliation : parraine tes proches et touche une commission à chaque vente réalisée grâce à toi.</p>
-      <ul class="landing-points" style="margin-top:0;">
-        <li><span class="dot">✓</span> <span><strong style="color:var(--green);">5€</strong> de commission pour chaque vente du pack seul (BAKIGEN ou BAKIPROFIT)</span></li>
-        <li><span class="dot">✓</span> <span><strong style="color:var(--green);">15€</strong> de commission pour chaque vente du pack complet</span></li>
-        <li><span class="dot">✓</span> Suivi de tes commissions directement dans ton espace BAKIPROFIT</li>
-      </ul>
-    </div>
-
-    <div class="landing-section">
-      <h3>Tarifs</h3>
-      <ul class="landing-points" style="margin-top:0;">
-        <li>
-          <span class="dot">✓</span>
-          <span>BAKIGEN seul — <strong style="color:var(--green);">24,90€</strong> (accès à vie)</span>
-        </li>
-        <li>
-          <span class="dot">✓</span>
-          <span>BAKIPROFIT seul — <strong style="color:var(--green);">19,90€</strong> (accès à vie)</span>
-        </li>
-        <li>
-          <span class="dot">✓</span>
-          <span>Pack BAKIGEN + BAKIPROFIT — <strong style="color:var(--green);">40€</strong> (accès à vie)</span>
-        </li>
-      </ul>
-      <p style="margin-top:12px; margin-bottom:0;">Pour l'achat, contacte-nous directement sur Instagram 👇</p>
-    </div>
-
-    <div class="landing-section" style="text-align:center;">
-      <p style="margin-bottom:6px;">Une question ou besoin d'aide ? Pour l'achat, c'est ici aussi 👇</p>
-      <a href="https://instagram.com/bakiprofitgen" target="_blank" style="color:var(--pink); font-weight:700; text-decoration:none; font-size:0.95rem;">📷 @bakiprofitgen</a>
+      <div class="landing-section" style="text-align:center;">
+        <p style="margin-bottom:6px;">Une question ou besoin d'aide ? Pour l'achat, c'est ici aussi 👇</p>
+        <a href="https://instagram.com/bakiprofitgen" target="_blank" style="color:var(--pink); font-weight:700; text-decoration:none; font-size:0.95rem;">📷 @bakiprofitgen</a>
+      </div>
     </div>
 
     <p class="cta-scroll-text" id="ctaToGate">Accéder à mon espace</p>
@@ -726,6 +758,16 @@
 
   document.getElementById('ctaToGate').addEventListener('click', () => {
     authCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+
+  // ---- Onglets de la page de présentation (avant connexion) ----
+  document.querySelectorAll('.landing-tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.landing-tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.landing-tab-panel').forEach(p => p.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('ltab-' + btn.dataset.ltab).classList.add('active');
+    });
   });
 
   function setAuthMode(mode) {
