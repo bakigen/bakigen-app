@@ -134,20 +134,19 @@
     margin-bottom: 10px;
   }
   .mock-price { color: var(--green); font-weight: 800; font-size: 1.1rem; }
-  .cta-scroll {
+  .cta-scroll-text {
     display: block;
     text-align: center;
     width: 100%;
-    padding: 14px;
-    border: none;
-    border-radius: 12px;
-    background: linear-gradient(90deg, var(--pink), var(--green));
-    color: #0a0a0a;
-    font-weight: 800;
-    font-size: 0.95rem;
+    padding: 6px;
+    color: var(--muted);
+    font-weight: 600;
+    font-size: 0.9rem;
     cursor: pointer;
     margin-top: 4px;
+    text-decoration: underline;
   }
+  .cta-scroll-text:hover { color: var(--pink); }
 
   .card {
     background: var(--card);
@@ -365,7 +364,7 @@
   <div class="logo">BAKIGEN</div>
   <div class="tagline">Photo → annonce Vinted prête à publier</div>
 
-  <div class="quick-auth-row">
+  <div class="quick-auth-row" id="quickAuthRow">
     <button type="button" class="quick-auth-btn" id="quickLoginBtn">Connexion</button>
     <button type="button" class="quick-auth-btn" id="quickSignupBtn">Inscription</button>
   </div>
@@ -435,7 +434,7 @@
       <a href="https://instagram.com/bakiprofitgen" target="_blank" style="color:var(--pink); font-weight:700; text-decoration:none; font-size:0.95rem;">📷 @bakiprofitgen</a>
     </div>
 
-    <button class="cta-scroll" id="ctaToGate">Accéder à mon espace →</button>
+    <p class="cta-scroll-text" id="ctaToGate">Accéder à mon espace</p>
   </div>
 
   <!-- Écran de connexion / inscription -->
@@ -754,6 +753,7 @@
       await clearMustChangePassword();
       document.getElementById('forceChangeCard').style.display = 'none';
       landingBlock.style.display = 'none';
+      document.getElementById('quickAuthRow').style.display = 'none';
       authCard.style.display = 'none';
       mainCard.style.display = 'block';
     } catch (err) {
@@ -782,6 +782,7 @@
     if (error || !data) return false;
     if (data.must_change_password) {
       landingBlock.style.display = 'none';
+      document.getElementById('quickAuthRow').style.display = 'none';
       authCard.style.display = 'none';
       mainCard.style.display = 'none';
       document.getElementById('resetCard').style.display = 'none';
@@ -794,6 +795,7 @@
   supabaseClient.auth.onAuthStateChange(async (event, session) => {
     if (event === 'PASSWORD_RECOVERY') {
       landingBlock.style.display = 'none';
+      document.getElementById('quickAuthRow').style.display = 'none';
       authCard.style.display = 'none';
       mainCard.style.display = 'none';
       document.getElementById('forceChangeCard').style.display = 'none';
@@ -808,12 +810,14 @@
       if (mustChange) return;
 
       landingBlock.style.display = 'none';
+      document.getElementById('quickAuthRow').style.display = 'none';
       authCard.style.display = 'none';
       document.getElementById('resetCard').style.display = 'none';
       document.getElementById('forceChangeCard').style.display = 'none';
       mainCard.style.display = 'block';
     } else {
       landingBlock.style.display = 'block';
+      document.getElementById('quickAuthRow').style.display = 'flex';
       authCard.style.display = 'block';
       document.getElementById('resetCard').style.display = 'none';
       document.getElementById('forceChangeCard').style.display = 'none';
