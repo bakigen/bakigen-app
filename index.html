@@ -290,6 +290,63 @@
     margin: 0;
     padding: 0;
   }
+
+  .welcome-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(7, 5, 8, 0.92);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  .welcome-card {
+    background: var(--card);
+    border: 1px solid #3A2438;
+    border-radius: 24px;
+    padding: 30px 24px;
+    max-width: 400px;
+    width: 100%;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+    text-align: center;
+  }
+  .welcome-emoji { font-size: 2.5rem; margin-bottom: 8px; }
+  .welcome-card h2 {
+    font-size: 1.3rem;
+    margin-bottom: 10px;
+    background: linear-gradient(90deg, var(--pink), var(--green));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .welcome-card p {
+    color: var(--muted);
+    font-size: 0.9rem;
+    margin-bottom: 16px;
+  }
+  .welcome-points {
+    list-style: none;
+    text-align: left;
+    margin-bottom: 20px;
+  }
+  .welcome-points li {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    font-size: 0.85rem;
+    color: var(--text);
+    margin-bottom: 10px;
+  }
+  .welcome-points li .dot {
+    flex-shrink: 0;
+    width: 20px; height: 20px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--pink), var(--green));
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.7rem; font-weight: 800; color: #0a0a0a;
+    margin-top: 1px;
+  }
   .pwd-card-title { font-size: 1rem; font-weight: 700; margin-bottom: 6px; text-align: center; }
   .pwd-card-sub { color: var(--muted); font-size: 0.85rem; text-align: center; margin-bottom: 20px; line-height: 1.4; }
   .user-badge-row {
@@ -500,6 +557,21 @@
 </style>
 </head>
 <body>
+
+<div class="welcome-overlay" id="welcomeOverlay" style="display:none;">
+  <div class="welcome-card">
+    <div class="welcome-emoji">👋</div>
+    <h2>Bienvenue sur BAKIGEN</h2>
+    <p>Voici en deux mots comment ça marche :</p>
+    <ul class="welcome-points">
+      <li><span class="dot">✓</span> Prends une photo de ton article, l'IA génère l'annonce à ta place</li>
+      <li><span class="dot">✓</span> Titre, description, marque, catégorie et prix conseillé automatiques</li>
+      <li><span class="dot">✓</span> Toutes tes annonces sont sauvegardées dans ton historique</li>
+      <li><span class="dot">✓</span> Un souci ? L'onglet Aide te met en relation directe avec nous</li>
+    </ul>
+    <button id="welcomeCloseBtn">C'est parti !</button>
+  </div>
+</div>
 
 <button id="scrollTopBtn" class="scroll-top-btn" style="display:none;" type="button">↑</button>
 
@@ -861,6 +933,16 @@
 </div>
 
 <script>
+  // ---- Écran de bienvenue au tout premier lancement (une seule fois par appareil) ----
+  const WELCOME_SEEN_KEY = 'bakigen_welcome_seen';
+  if (!localStorage.getItem(WELCOME_SEEN_KEY)) {
+    document.getElementById('welcomeOverlay').style.display = 'flex';
+  }
+  document.getElementById('welcomeCloseBtn').addEventListener('click', () => {
+    localStorage.setItem(WELCOME_SEEN_KEY, 'true');
+    document.getElementById('welcomeOverlay').style.display = 'none';
+  });
+
   // ---- Bouton "Haut de page" flottant ----
   const scrollTopBtn = document.getElementById('scrollTopBtn');
   window.addEventListener('scroll', () => {
