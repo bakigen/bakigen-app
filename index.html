@@ -337,6 +337,24 @@
   .history-item .h-meta { color: var(--muted); font-size: 0.8rem; display: flex; justify-content: space-between; }
   .history-item .h-price { color: var(--green); font-weight: 700; }
   .empty-history { text-align: center; color: var(--muted); font-size: 0.9rem; padding: 30px 0; }
+  .help-section {
+    background: var(--card);
+    border: 1px solid #3A2438;
+    border-radius: 16px;
+    padding: 18px;
+    margin-bottom: 14px;
+  }
+  .help-section h3 {
+    font-size: 0.95rem;
+    margin-bottom: 8px;
+    color: var(--text);
+  }
+  .help-section p {
+    color: var(--muted);
+    font-size: 0.85rem;
+    line-height: 1.55;
+    margin-bottom: 8px;
+  }
   .hist-search {
     margin-bottom: 14px;
   }
@@ -502,6 +520,7 @@
     <div class="tabs">
       <button class="tab-btn active" id="tabGenBtn">Générateur</button>
       <button class="tab-btn" id="tabHistBtn">Historique</button>
+      <button class="tab-btn" id="tabHelpBtn">Aide</button>
     </div>
 
     <!-- Onglet Générateur -->
@@ -624,6 +643,47 @@
         <div class="field-content price" id="dPrice"></div>
       </div>
       <button class="delete-item" id="deleteItemBtn">Supprimer cette annonce</button>
+    </div>
+
+    <!-- Onglet Aide / Guide d'utilisation -->
+    <div class="tab-panel" id="tabHelp">
+      <div class="help-section">
+        <h3>📸 Étape 1 — Ajouter des photos</h3>
+        <p>Dans l'onglet <strong>Générateur</strong>, clique sur la zone avec l'icône appareil photo. Choisis jusqu'à 5 photos de ton article (recto, verso, étiquette, détails...). Plus tes photos sont claires et nettes, plus l'annonce générée sera précise.</p>
+        <p style="margin-bottom:0;">Tu peux retirer une photo en cliquant sur la petite croix rouge sur la miniature, ou en ajouter une de plus avec le bouton "+".</p>
+      </div>
+
+      <div class="help-section">
+        <h3>🏷️ Étape 2 — Renseigner la marque (optionnel)</h3>
+        <p style="margin-bottom:0;">Si tu connais déjà la marque de l'article, indique-la dans le champ <strong>Marque (si connue)</strong>. Sinon, laisse-le vide : l'IA essaiera de la détecter automatiquement à partir des photos.</p>
+      </div>
+
+      <div class="help-section">
+        <h3>📏 Étape 3 — Taille et état</h3>
+        <p style="margin-bottom:0;">Indique la taille de l'article (ex : M, 38, 42...) et sélectionne son état dans la liste déroulante (Neuf avec étiquette, Très bon état, Bon état...). Ces informations seront directement intégrées dans l'annonce générée.</p>
+      </div>
+
+      <div class="help-section">
+        <h3>⚡ Étape 4 — Générer l'annonce</h3>
+        <p style="margin-bottom:0;">Clique sur le bouton <strong>Générer l'annonce</strong>. L'IA analyse tes photos et génère automatiquement : un titre, une description, la marque et la catégorie Vinted, ainsi qu'un prix de vente conseillé. Cela prend quelques secondes.</p>
+      </div>
+
+      <div class="help-section">
+        <h3>📋 Étape 5 — Copier et publier sur Vinted</h3>
+        <p>Une fois l'annonce générée, utilise les boutons <strong>Copier</strong> à côté du titre et de la description pour les coller directement dans ton annonce Vinted.</p>
+        <p style="margin-bottom:0;">Utilise également la marque, la catégorie, la taille, l'état et le prix conseillé affichés pour compléter le reste des champs sur Vinted.</p>
+      </div>
+
+      <div class="help-section">
+        <h3>📚 Étape 6 — Retrouver tes annonces</h3>
+        <p>Toutes les annonces que tu génères sont automatiquement enregistrées dans l'onglet <strong>Historique</strong>. Tu peux y retrouver le détail de chaque annonce en cliquant dessus, utiliser la barre de recherche pour en retrouver une précise, ou consulter tes statistiques (nombre total d'annonces et nombre généré ce mois-ci).</p>
+        <p style="margin-bottom:0;">Depuis le détail d'une annonce, tu peux aussi la supprimer si tu n'en as plus besoin.</p>
+      </div>
+
+      <div class="help-section">
+        <h3>🔒 Bon à savoir</h3>
+        <p style="margin-bottom:0;">Ton compte est personnel et sécurisé : personne d'autre ne voit tes annonces. Si tu oublies ton mot de passe, utilise le lien "Mot de passe oublié ?" sur l'écran de connexion.</p>
+      </div>
     </div>
   </div>
 </div>
@@ -853,19 +913,23 @@
   // ---- Onglets ----
   const tabGenBtn = document.getElementById('tabGenBtn');
   const tabHistBtn = document.getElementById('tabHistBtn');
+  const tabHelpBtn = document.getElementById('tabHelpBtn');
   const tabGen = document.getElementById('tabGen');
   const tabHist = document.getElementById('tabHist');
   const tabHistDetail = document.getElementById('tabHistDetail');
+  const tabHelp = document.getElementById('tabHelp');
 
   function showTab(name) {
-    [tabGen, tabHist, tabHistDetail].forEach(p => p.classList.remove('active'));
-    [tabGenBtn, tabHistBtn].forEach(b => b.classList.remove('active'));
+    [tabGen, tabHist, tabHistDetail, tabHelp].forEach(p => p.classList.remove('active'));
+    [tabGenBtn, tabHistBtn, tabHelpBtn].forEach(b => b.classList.remove('active'));
     if (name === 'gen') { tabGen.classList.add('active'); tabGenBtn.classList.add('active'); }
     if (name === 'hist') { tabHist.classList.add('active'); tabHistBtn.classList.add('active'); renderHistory(); }
     if (name === 'detail') { tabHistDetail.classList.add('active'); tabHistBtn.classList.add('active'); }
+    if (name === 'help') { tabHelp.classList.add('active'); tabHelpBtn.classList.add('active'); }
   }
   tabGenBtn.addEventListener('click', () => showTab('gen'));
   tabHistBtn.addEventListener('click', () => showTab('hist'));
+  tabHelpBtn.addEventListener('click', () => showTab('help'));
   document.getElementById('backToHistBtn').addEventListener('click', () => showTab('hist'));
 
   // ---- Historique (stocké sur Supabase, par compte) ----
