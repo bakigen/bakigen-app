@@ -979,19 +979,10 @@
 
   function renderHistStats(list) {
     const statsEl = document.getElementById('histStats');
-    const now = new Date();
-    const thisMonthCount = list.filter(item => {
-      const d = new Date(item.rawDate);
-      return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
-    }).length;
     statsEl.innerHTML = `
       <div class="stat-box">
         <div class="stat-num">${list.length}</div>
         <div class="stat-label">Total annonces</div>
-      </div>
-      <div class="stat-box">
-        <div class="stat-num">${thisMonthCount}</div>
-        <div class="stat-label">Ce mois-ci</div>
       </div>
     `;
   }
