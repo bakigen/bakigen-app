@@ -44,6 +44,26 @@
   }
   .tagline { text-align: center; color: var(--muted); margin-bottom: 24px; font-size: 0.9rem; }
 
+  .quick-auth-row {
+    display: flex;
+    gap: 10px;
+    max-width: 400px;
+    margin: -10px auto 24px;
+  }
+  .quick-auth-btn {
+    flex: 1;
+    margin: 0;
+    padding: 11px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    border-radius: 10px;
+    border: 1px solid #4A2E42;
+    background: #1F1219;
+    color: var(--text);
+    cursor: pointer;
+  }
+  .quick-auth-btn:hover { border-color: var(--pink); }
+
   /* ---- Landing / présentation avant le code d'accès ---- */
   .landing { margin-bottom: 26px; }
   .landing-section {
@@ -345,6 +365,11 @@
   <div class="logo">BAKIGEN</div>
   <div class="tagline">Photo → annonce Vinted prête à publier</div>
 
+  <div class="quick-auth-row">
+    <button type="button" class="quick-auth-btn" id="quickLoginBtn">Connexion</button>
+    <button type="button" class="quick-auth-btn" id="quickSignupBtn">Inscription</button>
+  </div>
+
   <!-- Présentation détaillée avant le code d'accès -->
   <div class="landing" id="landingBlock">
     <div class="landing-section" style="text-align:center;">
@@ -374,6 +399,16 @@
       <div class="mock-field-content"><strong>Robe fleurie Zara, taille M</strong></div>
       <div class="mock-field-content">Robe légère à motifs floraux, parfaite pour l'été. Peu portée, aucun défaut.</div>
       <div class="mock-field-content">Prix conseillé : <span class="mock-price">18€</span></div>
+    </div>
+
+    <div class="landing-section">
+      <h3>💰 Le programme d'affiliation</h3>
+      <p>Ton compte te donne aussi accès à un programme d'affiliation : parraine tes proches et touche une commission à chaque vente réalisée grâce à toi.</p>
+      <ul class="landing-points" style="margin-top:0;">
+        <li><span class="dot">✓</span> <span><strong style="color:var(--green);">5€</strong> de commission pour chaque vente du pack seul (BAKIGEN ou BAKIPROFIT)</span></li>
+        <li><span class="dot">✓</span> <span><strong style="color:var(--green);">15€</strong> de commission pour chaque vente du pack complet</span></li>
+        <li><span class="dot">✓</span> Suivi de tes commissions directement dans ton espace BAKIPROFIT</li>
+      </ul>
     </div>
 
     <div class="landing-section">
@@ -604,6 +639,15 @@
   }
   tabLoginBtn.addEventListener('click', () => setAuthMode('login'));
   tabSignupBtn.addEventListener('click', () => setAuthMode('signup'));
+
+  document.getElementById('quickLoginBtn').addEventListener('click', () => {
+    setAuthMode('login');
+    authCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+  document.getElementById('quickSignupBtn').addEventListener('click', () => {
+    setAuthMode('signup');
+    authCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
 
   authSubmitBtn.addEventListener('click', async () => {
     const email = authEmail.value.trim();
