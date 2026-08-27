@@ -291,6 +291,28 @@
     padding: 0;
   }
 
+  .toast {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%) translateY(-20px);
+    background: linear-gradient(90deg, var(--pink), var(--green));
+    color: #0a0a0a;
+    font-weight: 700;
+    font-size: 0.88rem;
+    padding: 12px 22px;
+    border-radius: 30px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+    z-index: 2000;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.25s ease, transform 0.25s ease;
+  }
+  .toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+
   .welcome-overlay {
     position: fixed;
     inset: 0;
@@ -557,6 +579,8 @@
 </style>
 </head>
 <body>
+
+<div class="toast" id="toast"></div>
 
 <div class="welcome-overlay" id="welcomeOverlay" style="display:none;">
   <div class="welcome-card">
@@ -1575,6 +1599,8 @@
         prix: parsed.prix,
         date: new Date().toLocaleDateString('fr-FR')
       });
+
+      showToast('✓ Annonce générée !');
     } catch (err) {
       alert("Erreur : " + err.message);
       console.error(err);
@@ -1583,6 +1609,17 @@
       generateBtn.disabled = false;
     }
   });
+
+  function showToast(message) {
+    const el = document.getElementById('toast');
+    if (!el) return;
+    el.textContent = message;
+    el.classList.add('show');
+    clearTimeout(showToast._timer);
+    showToast._timer = setTimeout(() => {
+      el.classList.remove('show');
+    }, 2200);
+  }
 
   document.querySelectorAll('.copy-btn').forEach(btn => {
     btn.addEventListener('click', () => {
