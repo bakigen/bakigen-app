@@ -255,6 +255,25 @@
     color: var(--muted);
     margin-top: 14px;
   }
+
+  .scroll-top-btn {
+    position: fixed;
+    bottom: 24px;
+    right: 20px;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--pink), var(--green));
+    color: #0a0a0a;
+    font-size: 1.2rem;
+    font-weight: 800;
+    border: none;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+    z-index: 900;
+    cursor: pointer;
+    margin: 0;
+    padding: 0;
+  }
   .pwd-card-title { font-size: 1rem; font-weight: 700; margin-bottom: 6px; text-align: center; }
   .pwd-card-sub { color: var(--muted); font-size: 0.85rem; text-align: center; margin-bottom: 20px; line-height: 1.4; }
   .user-badge-row {
@@ -465,6 +484,8 @@
 </style>
 </head>
 <body>
+
+<button id="scrollTopBtn" class="scroll-top-btn" style="display:none;" type="button">↑</button>
 
 <div class="app">
   <div class="brand" id="brandBlock">
@@ -824,6 +845,15 @@
 </div>
 
 <script>
+  // ---- Bouton "Haut de page" flottant ----
+  const scrollTopBtn = document.getElementById('scrollTopBtn');
+  window.addEventListener('scroll', () => {
+    scrollTopBtn.style.display = window.scrollY > 400 ? 'block' : 'none';
+  });
+  scrollTopBtn.addEventListener('click', () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  });
+
   const SUPABASE_URL = "https://adtjzozfvylcnlafbrzg.supabase.co";
   const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFkdGp6b3pmdnlsY25sYWZicnpnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODcxNTMzMTAsImV4cCI6MjEwMjcyOTMxMH0.gsOFJWguPQAs5pVAkTRrN74ZyAFQYHKU4iOZL88jRdc";
   const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
