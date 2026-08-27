@@ -229,6 +229,32 @@
   .auth-forgot { text-align: right; margin-top: 10px; margin-bottom: -4px; }
   .auth-forgot a { color: var(--muted); font-size: 0.8rem; text-decoration: none; cursor: pointer; }
   .auth-forgot a:hover { color: var(--pink); }
+
+  .password-field-wrap { position: relative; }
+  .password-field-wrap input { padding-right: 42px; }
+  .password-toggle-btn {
+    position: absolute;
+    top: 50%;
+    right: 10px;
+    transform: translateY(-50%);
+    width: auto;
+    margin: 0;
+    padding: 4px;
+    background: transparent;
+    border: none;
+    font-size: 1.1rem;
+    cursor: pointer;
+    line-height: 1;
+    opacity: 0.6;
+  }
+  .password-toggle-btn:hover { opacity: 1; }
+
+  .auth-secure-note {
+    text-align: center;
+    font-size: 0.75rem;
+    color: var(--muted);
+    margin-top: 14px;
+  }
   .pwd-card-title { font-size: 1rem; font-weight: 700; margin-bottom: 6px; text-align: center; }
   .pwd-card-sub { color: var(--muted); font-size: 0.85rem; text-align: center; margin-bottom: 20px; line-height: 1.4; }
   .user-badge-row {
@@ -567,7 +593,14 @@
       <button class="auth-tab-btn" id="tabSignupBtn">Inscription</button>
     </div>
     <input type="email" id="authEmail" placeholder="Email" autocomplete="email">
-    <input type="password" id="authPassword" placeholder="Mot de passe" autocomplete="current-password" style="margin-top:10px;">
+    <div class="password-field-wrap" style="margin-top:10px;">
+      <input type="password" id="authPassword" placeholder="Mot de passe" autocomplete="current-password">
+      <button type="button" class="password-toggle-btn" id="authPasswordToggle">👁️</button>
+    </div>
+    <div class="password-field-wrap" id="authPasswordConfirmWrap" style="display:none; margin-top:10px;">
+      <input type="password" id="authPasswordConfirm" placeholder="Confirme le mot de passe" autocomplete="new-password">
+      <button type="button" class="password-toggle-btn" id="authPasswordConfirmToggle">👁️</button>
+    </div>
     <div class="auth-forgot" id="authForgotWrap">
       <a id="forgotPasswordLink">Mot de passe oublié ?</a>
     </div>
@@ -575,6 +608,7 @@
     <button id="authSubmitBtn">Se connecter</button>
     <div class="error" id="authError"></div>
     <div class="auth-info" id="authInfo"></div>
+    <div class="auth-secure-note">🔒 Connexion sécurisée — tes données restent privées</div>
   </div>
 
   <!-- Écran : réinitialisation via lien email (mot de passe oublié) -->
@@ -828,6 +862,7 @@
     tabSignupBtn.classList.toggle('active', mode === 'signup');
     authSubmitBtn.textContent = mode === 'login' ? 'Se connecter' : 'Créer mon compte';
     document.getElementById('authInviteCode').style.display = mode === 'signup' ? 'block' : 'none';
+    document.getElementById('authPasswordConfirmWrap').style.display = mode === 'signup' ? 'flex' : 'none';
     document.getElementById('authForgotWrap').style.display = mode === 'login' ? 'block' : 'none';
     authError.textContent = '';
     authInfo.textContent = '';
@@ -844,6 +879,33 @@
     authCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
   });
 
+  // ---- Traduction des messages d'erreur Supabase en français convivial ----
+  function translateAuthError(err) {
+    const msg = (err && err.message) ? err.message.toLowerCase() : '';
+    if (msg.includes('invalid login credentials')) {
+      return 'Email ou mot de passe incorrect.';
+    }
+    if (msg.includes('email not confirmed')) {
+      return 'Ton email n\'a pas encore été confirmé. Vérifie ta boîte mail.';
+    }
+    if (msg.includes('user already registered') || msg.includes('already registered')) {
+      return 'Un compte existe déjà avec cet email.';
+    }
+    if (msg.includes('password should be at least') || msg.includes('at least 6')) {
+      return 'Le mot de passe doit faire au moins 6 caractères.';
+    }
+    if (msg.includes('invalid email') || msg.includes('unable to validate email')) {
+      return 'L\'adresse email n\'est pas valide.';
+    }
+    if (msg.includes('rate limit') || msg.includes('too many requests')) {
+      return 'Trop de tentatives. Réessaie dans quelques minutes.';
+    }
+    if (msg.includes('network') || msg.includes('failed to fetch')) {
+      return 'Problème de connexion internet. Réessaie.';
+    }
+    return (err && err.message) || 'Une erreur est survenue.';
+  }
+
   authSubmitBtn.addEventListener('click', async () => {
     const email = authEmail.value.trim();
     const password = authPassword.value;
@@ -854,6 +916,11 @@
       return;
     }
     if (authMode === 'signup') {
+      const passwordConfirm = document.getElementById('authPasswordConfirm').value;
+      if (password !== passwordConfirm) {
+        authError.textContent = 'Les deux mots de passe ne correspondent pas.';
+        return;
+      }
       const inviteCode = document.getElementById('authInviteCode').value.trim();
       if (inviteCode !== INVITE_CODE) {
         authError.textContent = 'Code d\'invitation incorrect.';
@@ -871,10 +938,33 @@
         authInfo.textContent = 'Compte créé ! Vérifie ta boîte mail si une confirmation est requise, sinon tu es déjà connecté.';
       }
     } catch (err) {
-      authError.textContent = err.message || 'Une erreur est survenue.';
+      authError.textContent = translateAuthError(err);
     } finally {
       authSubmitBtn.disabled = false;
     }
+  });
+
+  // ---- Afficher/masquer le mot de passe ----
+  document.getElementById('authPasswordToggle').addEventListener('click', () => {
+    const isHidden = authPassword.type === 'password';
+    authPassword.type = isHidden ? 'text' : 'password';
+    document.getElementById('authPasswordToggle').textContent = isHidden ? '🙈' : '👁️';
+  });
+  document.getElementById('authPasswordConfirmToggle').addEventListener('click', () => {
+    const confirmInput = document.getElementById('authPasswordConfirm');
+    const isHidden = confirmInput.type === 'password';
+    confirmInput.type = isHidden ? 'text' : 'password';
+    document.getElementById('authPasswordConfirmToggle').textContent = isHidden ? '🙈' : '👁️';
+  });
+
+  // ---- Validation au clavier (touche Entrée) ----
+  [authEmail, authPassword, document.getElementById('authPasswordConfirm')].forEach(input => {
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        authSubmitBtn.click();
+      }
+    });
   });
 
   document.getElementById('logoutLink').addEventListener('click', async () => {
@@ -897,7 +987,7 @@
       if (error) throw error;
       authInfo.textContent = 'Email envoyé ! Clique sur le lien reçu pour choisir un nouveau mot de passe.';
     } catch (err) {
-      authError.textContent = err.message || 'Une erreur est survenue.';
+      authError.textContent = translateAuthError(err);
     }
   });
 
