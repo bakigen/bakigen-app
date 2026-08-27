@@ -171,7 +171,28 @@
     background: transparent; color: var(--muted); border-radius: 7px;
   }
   .auth-tab-btn.active { background: linear-gradient(90deg, var(--pink), var(--pink-deep)); color: white; }
-  .user-badge { text-align: center; color: var(--muted); font-size: 0.8rem; margin-bottom: 16px; }
+  .auth-forgot { text-align: right; margin-top: 10px; margin-bottom: -4px; }
+  .auth-forgot a { color: var(--muted); font-size: 0.8rem; text-decoration: none; cursor: pointer; }
+  .auth-forgot a:hover { color: var(--pink); }
+  .pwd-card-title { font-size: 1rem; font-weight: 700; margin-bottom: 6px; text-align: center; }
+  .pwd-card-sub { color: var(--muted); font-size: 0.85rem; text-align: center; margin-bottom: 20px; line-height: 1.4; }
+  .user-badge-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+  .user-badge { color: var(--muted); font-size: 0.8rem; }
+  .logout-top {
+    color: var(--muted);
+    font-size: 0.8rem;
+    text-decoration: none;
+    cursor: pointer;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+  .logout-top:hover { color: var(--pink); }
   .upload-zone {
     border: 2px dashed #4A2E42;
     border-radius: 16px;
@@ -390,15 +411,42 @@
     </div>
     <input type="email" id="authEmail" placeholder="Email" autocomplete="email">
     <input type="password" id="authPassword" placeholder="Mot de passe" autocomplete="current-password" style="margin-top:10px;">
+    <div class="auth-forgot" id="authForgotWrap">
+      <a id="forgotPasswordLink">Mot de passe oublié ?</a>
+    </div>
     <input type="text" id="authInviteCode" placeholder="Code d'invitation" style="display:none; margin-top:10px;">
     <button id="authSubmitBtn">Se connecter</button>
     <div class="error" id="authError"></div>
     <div class="auth-info" id="authInfo"></div>
   </div>
 
+  <!-- Écran : réinitialisation via lien email (mot de passe oublié) -->
+  <div class="card" id="resetCard" style="display:none;">
+    <div class="pwd-card-title">Nouveau mot de passe</div>
+    <div class="pwd-card-sub">Choisis un nouveau mot de passe pour ton compte.</div>
+    <input type="password" id="resetNewPassword" placeholder="Nouveau mot de passe" autocomplete="new-password">
+    <input type="password" id="resetNewPassword2" placeholder="Confirme le mot de passe" autocomplete="new-password" style="margin-top:10px;">
+    <button id="resetSubmitBtn">Valider le nouveau mot de passe</button>
+    <div class="error" id="resetError"></div>
+    <div class="auth-info" id="resetInfo"></div>
+  </div>
+
+  <!-- Écran : changement obligatoire au premier login (compte créé par l'admin) -->
+  <div class="card" id="forceChangeCard" style="display:none;">
+    <div class="pwd-card-title">Bienvenue 👋</div>
+    <div class="pwd-card-sub">Pour la sécurité de ton compte, choisis ton propre mot de passe avant de continuer.</div>
+    <input type="password" id="forceNewPassword" placeholder="Nouveau mot de passe" autocomplete="new-password">
+    <input type="password" id="forceNewPassword2" placeholder="Confirme le mot de passe" autocomplete="new-password" style="margin-top:10px;">
+    <button id="forceSubmitBtn">Continuer</button>
+    <div class="error" id="forceError"></div>
+  </div>
+
   <!-- Écran principal -->
   <div class="card" id="mainCard" style="display:none;">
-    <div class="user-badge" id="userBadge"></div>
+    <div class="user-badge-row">
+      <span class="user-badge" id="userBadge"></span>
+      <a id="logoutLink" class="logout-top">Verrouiller le site</a>
+    </div>
     <div class="tabs">
       <button class="tab-btn active" id="tabGenBtn">Générateur</button>
       <button class="tab-btn" id="tabHistBtn">Historique</button>
@@ -518,8 +566,6 @@
       </div>
       <button class="delete-item" id="deleteItemBtn">Supprimer cette annonce</button>
     </div>
-
-    <div class="logout"><a id="logoutLink">Verrouiller le site</a></div>
   </div>
 </div>
 
@@ -552,6 +598,7 @@
     tabSignupBtn.classList.toggle('active', mode === 'signup');
     authSubmitBtn.textContent = mode === 'login' ? 'Se connecter' : 'Créer mon compte';
     document.getElementById('authInviteCode').style.display = mode === 'signup' ? 'block' : 'none';
+    document.getElementById('authForgotWrap').style.display = mode === 'login' ? 'block' : 'none';
     authError.textContent = '';
     authInfo.textContent = '';
   }
@@ -595,15 +642,137 @@
     await supabaseClient.auth.signOut();
   });
 
-  supabaseClient.auth.onAuthStateChange((event, session) => {
-    if (session) {
+  // ---- Mot de passe oublié ----
+  document.getElementById('forgotPasswordLink').addEventListener('click', async () => {
+    const email = authEmail.value.trim();
+    authError.textContent = '';
+    authInfo.textContent = '';
+    if (!email) {
+      authError.textContent = 'Renseigne ton email ci-dessus, puis clique sur "Mot de passe oublié ?".';
+      return;
+    }
+    try {
+      const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
+        redirectTo: window.location.origin + window.location.pathname
+      });
+      if (error) throw error;
+      authInfo.textContent = 'Email envoyé ! Clique sur le lien reçu pour choisir un nouveau mot de passe.';
+    } catch (err) {
+      authError.textContent = err.message || 'Une erreur est survenue.';
+    }
+  });
+
+  // ---- Écran "mot de passe oublié" : validation du nouveau mot de passe ----
+  document.getElementById('resetSubmitBtn').addEventListener('click', async () => {
+    const p1 = document.getElementById('resetNewPassword').value;
+    const p2 = document.getElementById('resetNewPassword2').value;
+    const resetError = document.getElementById('resetError');
+    const resetInfo = document.getElementById('resetInfo');
+    resetError.textContent = '';
+    resetInfo.textContent = '';
+    if (!p1 || p1.length < 6) {
+      resetError.textContent = 'Le mot de passe doit faire au moins 6 caractères.';
+      return;
+    }
+    if (p1 !== p2) {
+      resetError.textContent = 'Les deux mots de passe ne correspondent pas.';
+      return;
+    }
+    try {
+      const { error } = await supabaseClient.auth.updateUser({ password: p1 });
+      if (error) throw error;
+      await clearMustChangePassword();
+      resetInfo.textContent = 'Mot de passe mis à jour !';
+      document.getElementById('resetCard').style.display = 'none';
+      await checkForcedPasswordChange();
+    } catch (err) {
+      resetError.textContent = err.message || 'Une erreur est survenue.';
+    }
+  });
+
+  // ---- Écran "changement obligatoire au premier login" ----
+  document.getElementById('forceSubmitBtn').addEventListener('click', async () => {
+    const p1 = document.getElementById('forceNewPassword').value;
+    const p2 = document.getElementById('forceNewPassword2').value;
+    const forceError = document.getElementById('forceError');
+    forceError.textContent = '';
+    if (!p1 || p1.length < 6) {
+      forceError.textContent = 'Le mot de passe doit faire au moins 6 caractères.';
+      return;
+    }
+    if (p1 !== p2) {
+      forceError.textContent = 'Les deux mots de passe ne correspondent pas.';
+      return;
+    }
+    try {
+      const { error } = await supabaseClient.auth.updateUser({ password: p1 });
+      if (error) throw error;
+      await clearMustChangePassword();
+      document.getElementById('forceChangeCard').style.display = 'none';
       landingBlock.style.display = 'none';
       authCard.style.display = 'none';
       mainCard.style.display = 'block';
+    } catch (err) {
+      forceError.textContent = err.message || 'Une erreur est survenue.';
+    }
+  });
+
+  async function clearMustChangePassword() {
+    const { data: { session } } = await supabaseClient.auth.getSession();
+    if (!session) return;
+    await supabaseClient
+      .from('profiles')
+      .update({ must_change_password: false })
+      .eq('id', session.user.id);
+  }
+
+  // Vérifie si l'utilisateur connecté doit changer son mot de passe (première connexion)
+  async function checkForcedPasswordChange() {
+    const { data: { session } } = await supabaseClient.auth.getSession();
+    if (!session) return false;
+    const { data, error } = await supabaseClient
+      .from('profiles')
+      .select('must_change_password')
+      .eq('id', session.user.id)
+      .maybeSingle();
+    if (error || !data) return false;
+    if (data.must_change_password) {
+      landingBlock.style.display = 'none';
+      authCard.style.display = 'none';
+      mainCard.style.display = 'none';
+      document.getElementById('resetCard').style.display = 'none';
+      document.getElementById('forceChangeCard').style.display = 'block';
+      return true;
+    }
+    return false;
+  }
+
+  supabaseClient.auth.onAuthStateChange(async (event, session) => {
+    if (event === 'PASSWORD_RECOVERY') {
+      landingBlock.style.display = 'none';
+      authCard.style.display = 'none';
+      mainCard.style.display = 'none';
+      document.getElementById('forceChangeCard').style.display = 'none';
+      document.getElementById('resetCard').style.display = 'block';
+      return;
+    }
+
+    if (session) {
       document.getElementById('userBadge').textContent = 'Connecté : ' + session.user.email;
+
+      const mustChange = await checkForcedPasswordChange();
+      if (mustChange) return;
+
+      landingBlock.style.display = 'none';
+      authCard.style.display = 'none';
+      document.getElementById('resetCard').style.display = 'none';
+      document.getElementById('forceChangeCard').style.display = 'none';
+      mainCard.style.display = 'block';
     } else {
       landingBlock.style.display = 'block';
       authCard.style.display = 'block';
+      document.getElementById('resetCard').style.display = 'none';
+      document.getElementById('forceChangeCard').style.display = 'none';
       mainCard.style.display = 'none';
     }
   });
