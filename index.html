@@ -337,6 +337,24 @@
   .history-item .h-meta { color: var(--muted); font-size: 0.8rem; display: flex; justify-content: space-between; }
   .history-item .h-price { color: var(--green); font-weight: 700; }
   .empty-history { text-align: center; color: var(--muted); font-size: 0.9rem; padding: 30px 0; }
+  .hist-search {
+    margin-bottom: 14px;
+  }
+  .hist-stats {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+  .hist-stats .stat-box {
+    flex: 1;
+    background: var(--card);
+    border: 1px solid #3A2438;
+    border-radius: 14px;
+    padding: 12px;
+    text-align: center;
+  }
+  .hist-stats .stat-num { font-size: 1.3rem; font-weight: 800; color: var(--green); }
+  .hist-stats .stat-label { font-size: 0.68rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.5px; margin-top: 2px; }
   .history-detail-back {
     background: #3A2438;
     margin-bottom: 16px;
@@ -496,6 +514,11 @@
         </div>
       </div>
 
+      <div class="field">
+        <label>Marque (si connue)</label>
+        <input type="text" id="marqueInput" placeholder="Laisse vide pour détection automatique">
+      </div>
+
       <div class="row-2">
         <div class="field">
           <label>Taille</label>
@@ -560,6 +583,8 @@
 
     <!-- Onglet Historique -->
     <div class="tab-panel" id="tabHist">
+      <div class="hist-stats" id="histStats"></div>
+      <input type="text" id="histSearchInput" placeholder="🔍 Rechercher par titre, marque, taille..." class="hist-search">
       <div id="historyList"></div>
     </div>
 
@@ -861,7 +886,8 @@
       taille: row.taille,
       etat: row.etat,
       prix: row.prix,
-      date: new Date(row.created_at).toLocaleDateString('fr-FR')
+      date: new Date(row.created_at).toLocaleDateString('fr-FR'),
+      rawDate: row.created_at
     }));
   }
   async function addToHistory(entry) {
@@ -885,11 +911,31 @@
   }
   let currentDetailId = null;
 
-  async function renderHistory() {
-    const list = await getHistory();
+  let fullHistoryCache = [];
+
+  function renderHistStats(list) {
+    const statsEl = document.getElementById('histStats');
+    const now = new Date();
+    const thisMonthCount = list.filter(item => {
+      const d = new Date(item.rawDate);
+      return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+    }).length;
+    statsEl.innerHTML = `
+      <div class="stat-box">
+        <div class="stat-num">${list.length}</div>
+        <div class="stat-label">Total annonces</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-num">${thisMonthCount}</div>
+        <div class="stat-label">Ce mois-ci</div>
+      </div>
+    `;
+  }
+
+  function renderHistoryList(list) {
     const container = document.getElementById('historyList');
     if (list.length === 0) {
-      container.innerHTML = '<div class="empty-history">Aucune annonce générée pour l\'instant.</div>';
+      container.innerHTML = '<div class="empty-history">Aucune annonce ne correspond à ta recherche.</div>';
       return;
     }
     container.innerHTML = list.map(item => `
@@ -905,6 +951,32 @@
       el.addEventListener('click', () => openDetail(el.dataset.id));
     });
   }
+
+  async function renderHistory() {
+    const list = await getHistory();
+    fullHistoryCache = list;
+    renderHistStats(list);
+    if (list.length === 0) {
+      document.getElementById('historyList').innerHTML = '<div class="empty-history">Aucune annonce générée pour l\'instant.</div>';
+      return;
+    }
+    renderHistoryList(list);
+  }
+
+  document.getElementById('histSearchInput').addEventListener('input', (e) => {
+    const q = e.target.value.trim().toLowerCase();
+    if (!q) {
+      renderHistoryList(fullHistoryCache);
+      return;
+    }
+    const filtered = fullHistoryCache.filter(item =>
+      (item.titre || '').toLowerCase().includes(q) ||
+      (item.marque || '').toLowerCase().includes(q) ||
+      (item.taille || '').toLowerCase().includes(q) ||
+      (item.categorie || '').toLowerCase().includes(q)
+    );
+    renderHistoryList(filtered);
+  });
 
   async function openDetail(id) {
     const list = await getHistory();
@@ -1011,12 +1083,13 @@
 
     const taille = tailleInput.value.trim() || 'Non précisée';
     const etat = etatInput.value;
+    const marqueManuelle = document.getElementById('marqueInput').value.trim();
 
     try {
       const response = await fetch("/api/generate", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ images, taille, etat })
+        body: JSON.stringify({ images, taille, etat, marqueConnue: marqueManuelle || undefined })
       });
       const parsed = await response.json();
       if (!response.ok) {
@@ -1024,9 +1097,11 @@
         throw new Error(detail || ('Erreur serveur ' + response.status));
       }
 
+      const marqueFinale = marqueManuelle || parsed.marque || 'Non identifiée';
+
       document.getElementById('titleText').textContent = parsed.titre;
       document.getElementById('descText').textContent = parsed.description;
-      document.getElementById('brandText').textContent = parsed.marque || 'Non identifiée';
+      document.getElementById('brandText').textContent = marqueFinale;
       document.getElementById('categoryText').textContent = parsed.categorie || 'Non déterminée';
       document.getElementById('sizeText').textContent = taille;
       document.getElementById('conditionText').textContent = etat;
@@ -1036,7 +1111,7 @@
       await addToHistory({
         titre: parsed.titre,
         description: parsed.description,
-        marque: parsed.marque || 'Non identifiée',
+        marque: marqueFinale,
         categorie: parsed.categorie || 'Non déterminée',
         taille: taille,
         etat: etat,
