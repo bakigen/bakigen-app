@@ -218,6 +218,15 @@
     outline: none;
   }
   input:focus { border-color: var(--pink); }
+  input[type=text]:-webkit-autofill,
+  input[type=password]:-webkit-autofill,
+  input[type=email]:-webkit-autofill {
+    -webkit-text-fill-color: var(--text);
+    -webkit-box-shadow: 0 0 0px 1000px #1F1219 inset;
+    box-shadow: 0 0 0px 1000px #1F1219 inset;
+    caret-color: var(--text);
+    transition: background-color 9999s ease-in-out 0s;
+  }
   button {
     width: 100%;
     padding: 14px;
