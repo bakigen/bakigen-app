@@ -1578,7 +1578,16 @@
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ images, taille, etat, marqueConnue: marqueManuelle || undefined })
       });
-      const parsed = await response.json();
+
+      const rawText = await response.text();
+      let parsed;
+      try {
+        parsed = JSON.parse(rawText);
+      } catch (parseErr) {
+        // Le serveur n'a pas renvoyé du JSON valide (souvent une page d'erreur ou un timeout).
+        throw new Error(`Réponse du serveur invalide (code ${response.status}). ${rawText.slice(0, 200) || 'Réponse vide.'}`);
+      }
+
       if (!response.ok) {
         const detail = typeof parsed.error === 'string' ? parsed.error : JSON.stringify(parsed.error);
         throw new Error(detail || ('Erreur serveur ' + response.status));
