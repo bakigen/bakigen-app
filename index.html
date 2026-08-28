@@ -30,11 +30,6 @@
   }
   .app { width: 100%; max-width: 480px; margin: 0 auto; }
 
-  /* Sur ordinateur (grand écran), on utilise plus de largeur — le mobile garde le même rendu */
-  @media (min-width: 900px) {
-    .app { max-width: 1000px; }
-  }
-
   .brand { display: flex; flex-direction: column; align-items: center; margin-bottom: 6px; }
   .brand img { width: 76px; height: 76px; border-radius: 50%; margin-bottom: 10px; box-shadow: 0 0 0 2px rgba(255,255,255,0.05), 0 10px 30px rgba(0,0,0,0.5); }
   .logo {
@@ -681,7 +676,7 @@
 
       <div class="landing-section">
         <h3>🎓 Aide et accompagnement</h3>
-        <p style="margin-bottom:0;">Un guide pas à pas est intégré directement dans l'app pour t'accompagner à chaque étape, avec un contact direct sur Instagram en cas de besoin.</p>
+        <p style="margin-bottom:0;">Un guide pas à pas est intégré directement dans l'app pour t'accompagner à chaque étape, avec un contact direct sur Instagram ou TikTok en cas de besoin.</p>
       </div>
     </div>
 
@@ -712,12 +707,15 @@
             <span>Pack BAKIGEN + BAKIPROFIT — <strong style="color:var(--green);">40€</strong> (accès à vie)</span>
           </li>
         </ul>
-        <p style="margin-top:12px; margin-bottom:0;">Pour l'achat, contacte-nous directement sur Instagram 👇</p>
+        <p style="margin-top:12px; margin-bottom:0;">Pour l'achat, contacte-nous directement sur Instagram ou TikTok 👇</p>
       </div>
 
       <div class="landing-section" style="text-align:center;">
         <p style="margin-bottom:6px;">Une question ou besoin d'aide ? Pour l'achat, c'est ici aussi 👇</p>
-        <a href="https://instagram.com/bakiprofitgen" target="_blank" style="color:var(--pink); font-weight:700; text-decoration:none; font-size:0.95rem;">📷 @bakiprofitgen</a>
+        <div style="display:flex; justify-content:center; gap:18px; flex-wrap:wrap;">
+          <a href="https://instagram.com/bakiprofitgen" target="_blank" style="color:var(--pink); font-weight:700; text-decoration:none; font-size:0.95rem;">📷 @bakiprofitgen</a>
+          <a href="https://tiktok.com/@baki.revente" target="_blank" style="color:var(--pink); font-weight:700; text-decoration:none; font-size:0.95rem;">🎵 @baki.revente</a>
+        </div>
       </div>
     </div>
 
@@ -954,8 +952,11 @@
 
       <div class="help-section" style="text-align:center;">
         <h3 style="display:inline-block;">❓ Un souci, une question ?</h3>
-        <p>Si tu rencontres un problème ou que tu as besoin d'aide, contacte-moi directement sur Instagram, je te réponds au plus vite 👇</p>
-        <a href="https://instagram.com/bakiprofitgen" target="_blank" class="help-contact-btn">📷 Contacter @bakiprofitgen</a>
+        <p>Si tu rencontres un problème ou que tu as besoin d'aide, contacte-moi directement sur Instagram ou TikTok, je te réponds au plus vite 👇</p>
+        <div style="display:flex; justify-content:center; gap:10px; flex-wrap:wrap;">
+          <a href="https://instagram.com/bakiprofitgen" target="_blank" class="help-contact-btn">📷 @bakiprofitgen</a>
+          <a href="https://tiktok.com/@baki.revente" target="_blank" class="help-contact-btn">🎵 @baki.revente</a>
+        </div>
       </div>
     </div>
   </div>
