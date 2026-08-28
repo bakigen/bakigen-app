@@ -30,6 +30,11 @@
   }
   .app { width: 100%; max-width: 480px; margin: 0 auto; }
 
+  /* Sur ordinateur (grand écran), on utilise plus de largeur — le mobile garde le même rendu */
+  @media (min-width: 900px) {
+    .app { max-width: 1000px; }
+  }
+
   .brand { display: flex; flex-direction: column; align-items: center; margin-bottom: 6px; }
   .brand img { width: 76px; height: 76px; border-radius: 50%; margin-bottom: 10px; box-shadow: 0 0 0 2px rgba(255,255,255,0.05), 0 10px 30px rgba(0,0,0,0.5); }
   .logo {
