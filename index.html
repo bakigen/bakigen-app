@@ -408,7 +408,9 @@
   body.hide-histTitre .sensitive-histTitre,
   body.hide-histMarque .sensitive-histMarque,
   body.hide-histTaille .sensitive-histTaille,
-  body.hide-histPrix .sensitive-histPrix {
+  body.hide-histPrix .sensitive-histPrix,
+  body.hide-eurGen .sensitive-eurGen,
+  body.hide-eurHist .sensitive-eurHist {
     filter: blur(7px);
     user-select: none;
     transition: filter 0.2s ease;
@@ -734,6 +736,12 @@
         <h3>🎓 Aide et accompagnement</h3>
         <p style="margin-bottom:0;">Un guide pas à pas est intégré directement dans l'app pour t'accompagner à chaque étape, avec un contact direct sur Instagram ou TikTok en cas de besoin.</p>
       </div>
+
+      <div class="landing-section" style="text-align:center;">
+        <h3>📊 Découvre aussi BAKIPROFIT</h3>
+        <p>Une fois tes annonces générées avec BAKIGEN, suis précisément tes bénéfices, ton stock et bien plus avec notre autre outil, BAKIPROFIT.</p>
+        <a href="https://bakiprofit-app.vercel.app/" target="_blank" class="help-contact-btn">📊 Voir BAKIPROFIT</a>
+      </div>
     </div>
 
     <div class="landing-tab-panel" id="ltab-tarifs">
@@ -861,6 +869,10 @@
             <input type="checkbox" data-privacy="genPrix" checked>
             <span>Prix</span>
           </label>
+          <label class="privacy-menu-item">
+            <input type="checkbox" data-privacy="eurGen">
+            <span>Symbole €</span>
+          </label>
         </div>
       </div>
       <div class="upload-zone sensitive-genPhoto" id="uploadZone">
@@ -959,6 +971,10 @@
           <label class="privacy-menu-item">
             <input type="checkbox" data-privacy="histPrix" checked>
             <span>Prix</span>
+          </label>
+          <label class="privacy-menu-item">
+            <input type="checkbox" data-privacy="eurHist">
+            <span>Symbole €</span>
           </label>
         </div>
       </div>
@@ -1075,6 +1091,12 @@
           <a href="https://tiktok.com/@baki.revente" target="_blank" class="help-contact-btn">🎵 @baki.revente</a>
           <a href="https://discord.gg/daN4xhjCp" target="_blank" class="help-contact-btn">💬 Discord</a>
         </div>
+      </div>
+
+      <div class="help-section" style="text-align:center;">
+        <h3 style="display:inline-block;">📊 Découvre aussi BAKIPROFIT</h3>
+        <p>Une fois tes annonces générées, suis précisément tes bénéfices, ton stock et bien plus avec notre autre outil.</p>
+        <a href="https://bakiprofit-app.vercel.app/" target="_blank" class="help-contact-btn">📊 Voir BAKIPROFIT</a>
       </div>
     </div>
   </div>
@@ -1430,6 +1452,8 @@
     document.body.classList.toggle('hide-histMarque', !!prefs.histMarque);
     document.body.classList.toggle('hide-histTaille', !!prefs.histTaille);
     document.body.classList.toggle('hide-histPrix', !!prefs.histPrix);
+    document.body.classList.toggle('hide-eurGen', !!prefs.eurGen);
+    document.body.classList.toggle('hide-eurHist', !!prefs.eurHist);
   }
 
   document.querySelectorAll('.privacy-menu-dropdown input[type=checkbox]').forEach(cb => {
@@ -1543,7 +1567,7 @@
         <div class="h-meta">
           <span class="sensitive-histMarque">${escapeHtml(item.marque || 'Marque ?')}</span> ·
           <span class="sensitive-histTaille">${escapeHtml(item.taille)}</span> · ${item.date}
-          <span class="h-price sensitive-histPrix">${escapeHtml(item.prix)}</span>
+          <span class="h-price sensitive-histPrix">${wrapEuro(item.prix, 'Hist')}</span>
         </div>
       </div>
     `).join('');
@@ -1688,6 +1712,10 @@
     const div = document.createElement('div');
     div.textContent = str ?? '';
     return div.innerHTML;
+  }
+  // Enveloppe le symbole € dans un span masquable, sans toucher aux chiffres
+  function wrapEuro(str, cat) {
+    return escapeHtml(str).replace('€', `<span class="sensitive-eur${cat}">€</span>`);
   }
 
   // ---- Générateur ----
@@ -1834,7 +1862,7 @@
       document.getElementById('categoryText').textContent = parsed.categorie || 'Non déterminée';
       document.getElementById('sizeText').textContent = taille;
       document.getElementById('conditionText').textContent = etat;
-      document.getElementById('priceText').textContent = parsed.prix;
+      document.getElementById('priceText').innerHTML = wrapEuro(parsed.prix, 'Gen');
       result.classList.add('show');
 
       await addToHistory({
