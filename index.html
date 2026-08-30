@@ -401,8 +401,14 @@
   }
   .logout-top:hover { color: var(--pink); }
 
-  body.hide-gen .sensitive-gen,
-  body.hide-hist .sensitive-hist {
+  body.hide-genPhoto .sensitive-genPhoto,
+  body.hide-genTitre .sensitive-genTitre,
+  body.hide-genDesc .sensitive-genDesc,
+  body.hide-genPrix .sensitive-genPrix,
+  body.hide-histTitre .sensitive-histTitre,
+  body.hide-histMarque .sensitive-histMarque,
+  body.hide-histTaille .sensitive-histTaille,
+  body.hide-histPrix .sensitive-histPrix {
     filter: blur(7px);
     user-select: none;
     transition: filter 0.2s ease;
@@ -840,12 +846,24 @@
         <button type="button" class="logout-top privacy-menu-btn" data-menu="gen">🙈 Masquer des infos</button>
         <div class="privacy-menu-dropdown" data-dropdown="gen" style="display:none;">
           <label class="privacy-menu-item">
-            <input type="checkbox" data-privacy="gen" checked>
-            <span>Photos, titre, description et prix</span>
+            <input type="checkbox" data-privacy="genPhoto" checked>
+            <span>Photo</span>
+          </label>
+          <label class="privacy-menu-item">
+            <input type="checkbox" data-privacy="genTitre" checked>
+            <span>Titre</span>
+          </label>
+          <label class="privacy-menu-item">
+            <input type="checkbox" data-privacy="genDesc" checked>
+            <span>Description</span>
+          </label>
+          <label class="privacy-menu-item">
+            <input type="checkbox" data-privacy="genPrix" checked>
+            <span>Prix</span>
           </label>
         </div>
       </div>
-      <div class="upload-zone sensitive-gen" id="uploadZone">
+      <div class="upload-zone sensitive-genPhoto" id="uploadZone">
         <input type="file" id="fileInput" accept="image/*" multiple>
         <div id="uploadContent">
           <div class="upload-icon">📸</div>
@@ -879,17 +897,17 @@
       <button id="regenerateBtn" style="display:none; background:#3A2438; margin-top:8px;">🔄 Régénérer (mêmes photos)</button>
       <div class="spinner" id="spinner">Analyse des photos en cours...</div>
 
-      <div class="result sensitive-gen" id="result">
+      <div class="result" id="result">
         <div class="field">
           <label>Titre</label>
-          <div class="field-content">
+          <div class="field-content sensitive-genTitre">
             <button class="copy-btn" data-copy="titleText">Copier</button>
             <span id="titleText"></span>
           </div>
         </div>
         <div class="field">
           <label>Description</label>
-          <div class="field-content">
+          <div class="field-content sensitive-genDesc">
             <button class="copy-btn" data-copy="descText">Copier</button>
             <span id="descText"></span>
           </div>
@@ -916,7 +934,7 @@
         </div>
         <div class="field">
           <label>Prix conseillé</label>
-          <div class="field-content price" id="priceText"></div>
+          <div class="field-content price sensitive-genPrix" id="priceText"></div>
         </div>
       </div>
     </div>
@@ -927,8 +945,20 @@
         <button type="button" class="logout-top privacy-menu-btn" data-menu="hist">🙈 Masquer des infos</button>
         <div class="privacy-menu-dropdown" data-dropdown="hist" style="display:none;">
           <label class="privacy-menu-item">
-            <input type="checkbox" data-privacy="hist" checked>
-            <span>Titres et prix des annonces</span>
+            <input type="checkbox" data-privacy="histTitre" checked>
+            <span>Titre</span>
+          </label>
+          <label class="privacy-menu-item">
+            <input type="checkbox" data-privacy="histMarque" checked>
+            <span>Marque</span>
+          </label>
+          <label class="privacy-menu-item">
+            <input type="checkbox" data-privacy="histTaille" checked>
+            <span>Taille</span>
+          </label>
+          <label class="privacy-menu-item">
+            <input type="checkbox" data-privacy="histPrix" checked>
+            <span>Prix</span>
           </label>
         </div>
       </div>
@@ -1392,8 +1422,14 @@
 
   function applyPrivacyPrefs() {
     const prefs = getPrivacyPrefs();
-    document.body.classList.toggle('hide-gen', !!prefs.gen);
-    document.body.classList.toggle('hide-hist', !!prefs.hist);
+    document.body.classList.toggle('hide-genPhoto', !!prefs.genPhoto);
+    document.body.classList.toggle('hide-genTitre', !!prefs.genTitre);
+    document.body.classList.toggle('hide-genDesc', !!prefs.genDesc);
+    document.body.classList.toggle('hide-genPrix', !!prefs.genPrix);
+    document.body.classList.toggle('hide-histTitre', !!prefs.histTitre);
+    document.body.classList.toggle('hide-histMarque', !!prefs.histMarque);
+    document.body.classList.toggle('hide-histTaille', !!prefs.histTaille);
+    document.body.classList.toggle('hide-histPrix', !!prefs.histPrix);
   }
 
   document.querySelectorAll('.privacy-menu-dropdown input[type=checkbox]').forEach(cb => {
@@ -1503,10 +1539,11 @@
     }
     container.innerHTML = list.map(item => `
       <div class="history-item" data-id="${item.id}">
-        <div class="h-title sensitive-hist">${escapeHtml(item.titre)}</div>
+        <div class="h-title sensitive-histTitre">${escapeHtml(item.titre)}</div>
         <div class="h-meta">
-          <span class="sensitive-hist">${escapeHtml(item.marque || 'Marque ?')} · ${escapeHtml(item.taille)} · ${item.date}</span>
-          <span class="h-price sensitive-hist">${escapeHtml(item.prix)}</span>
+          <span class="sensitive-histMarque">${escapeHtml(item.marque || 'Marque ?')}</span> ·
+          <span class="sensitive-histTaille">${escapeHtml(item.taille)}</span> · ${item.date}
+          <span class="h-price sensitive-histPrix">${escapeHtml(item.prix)}</span>
         </div>
       </div>
     `).join('');
